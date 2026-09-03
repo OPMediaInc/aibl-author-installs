@@ -93,6 +93,7 @@ detect_platform() {
 }
 
 # 2. Provision Isolated Node.js Runtime
+RUNTIME_TYPE="isolated"
 setup_node_runtime() {
   mkdir -p "${AIBL_HOME}" "${RUNTIME_DIR}" "${AIBL_BIN_DIR}" "${LOCAL_BIN_DIR}"
 
@@ -104,6 +105,7 @@ setup_node_runtime() {
     installed_ver="$("${node_binary}" -v 2>/dev/null || echo "")"
     if [ "${installed_ver}" = "${NODE_VERSION}" ]; then
       info "Standalone Node.js LTS (${NODE_VERSION}) runtime already provisioned."
+      RUNTIME_TYPE="existing"
       need_download=false
     fi
   fi
@@ -129,12 +131,14 @@ setup_node_runtime() {
     tar -xzf "${temp_tar}" -C "${NODE_DIR}" --strip-components=1
     rm -f "${temp_tar}"
     success "Node.js runtime provisioned successfully."
+    RUNTIME_TYPE="isolated"
   fi
 }
 
 # 3. Install or Update AIBL Author CLI Package
 install_cli() {
-  info "Installing ${BOLD}${PACKAGE_NAME}${RESET} in isolated runtime..."
+  local runtime_type="${1:-${RUNTIME_TYPE}}"
+  info "Installing ${BOLD}${PACKAGE_NAME}${RESET} in ${runtime_type} runtime..."
   local npm_binary="${NODE_DIR}/bin/npm"
 
   "${npm_binary}" install -g --prefix "${RUNTIME_DIR}" "${PACKAGE_NAME}@latest" --silent --no-audit --no-fund >/dev/null 2>&1 || {

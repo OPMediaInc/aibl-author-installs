@@ -11,7 +11,7 @@ There are different commands to run depending on how you like to install CLI app
 In order to install the CLI execute the following command on Windows:
 
 ```sh
-powershell -ExecutionPolicy ByPass -c "iex (irm https://raw.githubusercontent.com/opmediainc/aibl-author-installs/master/cli/install.ps1)"
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/opmediainc/aibl-author-installs/master/cli/install.ps1" -OutFile "install-aibl.ps1"; powershell -ExecutionPolicy ByPass -c '.\install-aibl.ps1'; Remove-Item install-aibl.ps1
 ```
 
 Or the following command for Mac and Linux:
@@ -32,7 +32,7 @@ cd cli
 Then execute the following command on windows:
 
 ```sh
-powershell -ExecutionPolicy ByPass -c '.\Install.ps1'
+powershell -ExecutionPolicy ByPass -c '.\install.ps1'
 ```
 
 Or the following commands on Mac and Linux:

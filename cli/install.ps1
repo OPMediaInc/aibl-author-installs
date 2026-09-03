@@ -2,7 +2,7 @@
 # AiBL Author CLI - Automated Standalone Installer for Windows (PowerShell)
 # ==============================================================================
 # Usage:
-#   powershell -ExecutionPolicy ByPass -c "iex (irm https://raw.githubusercontent.com/opmediainc/aibl-author-installs/master/cli/install.ps1)"
+#   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/opmediainc/aibl-author-installs/master/cli/install.ps1" -OutFile "install-aibl.ps1"; powershell -ExecutionPolicy ByPass -c '.\install-aibl.ps1'; Remove-Item install-aibl.ps1
 # ==============================================================================
 
 $ErrorActionPreference = 'Stop'
@@ -89,7 +89,7 @@ function Setup-NodeRuntime {
             $installedVer = (& $nodeExe -v 2>$null).Trim()
             if ($installedVer -eq $NodeVersion) {
                 Write-Info "Standalone Node.js LTS ($NodeVersion) runtime already provisioned."
-                $needDownload = $false
+                return "existing"
             }
         } catch {
             $needDownload = $true
@@ -124,10 +124,14 @@ function Setup-NodeRuntime {
 
         Write-Success "Node.js runtime provisioned successfully."
     }
+
+    return "isolated"
 }
 
 function Install-CLI {
-    Write-Info "Installing $PackageName in isolated runtime..."
+    param([string]$runtimeType = "isolated")
+
+    Write-Info "Installing $PackageName in $runtimeType runtime..."
     $npmCmd = Join-Path $NodeDir "npm.cmd"
 
     $process = Start-Process -FilePath $npmCmd -ArgumentList "install", "-g", "--prefix", "`"$RuntimeDir`"", "$PackageName@latest", "--no-audit", "--no-fund" -NoNewWindow -Wait -PassThru
@@ -220,8 +224,8 @@ function Configure-ClaudeDesktop {
 function Main {
     Print-Banner
     $arch = Detect-Architecture
-    Setup-NodeRuntime $arch
-    Install-CLI
+    $runtimeType = Setup-NodeRuntime $arch
+    Install-CLI -runtimeType $runtimeType
     Setup-Executables
     Configure-EnvironmentPath
     Configure-ClaudeDesktop
@@ -239,9 +243,9 @@ function Main {
         }
     } catch {}
 
-    Write-Host "  • Installed Version : v$version" -ForegroundColor White
-    Write-Host "  • Default Context   : cloud (https://demo.aiblx.ai)" -ForegroundColor Cyan
-    Write-Host "  • Executable Path   : $(Join-Path $BinDir 'aibl.cmd')`n" -ForegroundColor DarkGray
+    Write-Host "  - Installed Version : v$version" -ForegroundColor White
+    Write-Host "  - Default Context   : cloud (https://demo.aiblx.ai)" -ForegroundColor Cyan
+    Write-Host "  - Executable Path   : $(Join-Path $BinDir 'aibl.cmd')`n" -ForegroundColor DarkGray
 
     Write-Host "Next Steps:" -ForegroundColor White
     Write-Host "  1. Authenticate with your AiBL account:"
