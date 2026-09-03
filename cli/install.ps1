@@ -2,39 +2,49 @@
 # AiBL Author CLI - Automated Standalone Installer for Windows (PowerShell)
 # ==============================================================================
 # Usage:
-#   powershell -ExecutionPolicy ByPass -c "irm https://raw.githubusercontent.com/opmediainc/aibl-author/main/scripts/install.ps1 | iex"
+#   powershell -ExecutionPolicy ByPass -c "iex (irm https://raw.githubusercontent.com/opmediainc/aibl-author-installs/master/cli/install.ps1)"
 # ==============================================================================
 
 $ErrorActionPreference = 'Stop'
 
+try {
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+    $OutputEncoding = [System.Text.Encoding]::UTF8
+} catch {}
+
 function Print-Banner {
-    Write-Host @"
+    $banner = @'
 
     ___      _   ____   __         ___             __     __                
    /   |    (_) / __ ) / /        /   |  __  __   / /_   / /_   ____   _____
   / /| |   / / / __  |/ /        / /| | / / / /  / __/  / __ \ / __ \ / ___/
  / ___ |  / / / /_/ // /___     / ___ |/ /_/ /  / /_   / / / // /_/ // /    
 /_/  |_| /_/ /_____//_____/    /_/  |_|\__,_/   \__/  /_/ /_/ \____//_/     
-                                                                            
-"@ -ForegroundColor Cyan
+                                                                             
+'@
+    Write-Host $banner -ForegroundColor Cyan
     Write-Host "AiBL Author CLI & MCP Automated Installer" -ForegroundColor White
     Write-Host "https://demo.aiblx.ai`n" -ForegroundColor DarkGray
 }
 
-function Write-Info($message) {
-    Write-Host "ℹ $message" -ForegroundColor Cyan
+function Write-Info {
+    param([string]$message)
+    Write-Host "[*] $message" -ForegroundColor Cyan
 }
 
-function Write-Success($message) {
-    Write-Host "✔ $message" -ForegroundColor Green
+function Write-Success {
+    param([string]$message)
+    Write-Host "[+] $message" -ForegroundColor Green
 }
 
-function Write-Warn($message) {
-    Write-Host "▲ $message" -ForegroundColor Yellow
+function Write-Warn {
+    param([string]$message)
+    Write-Host "[!] $message" -ForegroundColor Yellow
 }
 
-function Write-Err($message) {
-    Write-Host "✖ $message" -ForegroundColor Red
+function Write-Err {
+    param([string]$message)
+    Write-Host "[x] $message" -ForegroundColor Red
 }
 
 $AiblHome = Join-Path $HOME ".aibl"
@@ -64,7 +74,9 @@ function Detect-Architecture {
     return $arch
 }
 
-function Setup-NodeRuntime($arch) {
+function Setup-NodeRuntime {
+    param([string]$arch)
+
     New-Item -ItemType Directory -Force -Path $AiblHome | Out-Null
     New-Item -ItemType Directory -Force -Path $RuntimeDir | Out-Null
     New-Item -ItemType Directory -Force -Path $BinDir | Out-Null
@@ -129,7 +141,7 @@ function Install-CLI {
 
 function Setup-Executables {
     $wrapperCmd = Join-Path $BinDir "aibl.cmd"
-    $cmdContent = @"
+    $cmdContent = @'
 @ECHO OFF
 SETLOCAL
 SET "AIBL_DIR=%USERPROFILE%\.aibl"
@@ -146,26 +158,26 @@ IF EXIST "%CLI_ENTRY%" (
   ECHO Error: AiBL Author CLI executable not found in %AIBL_DIR%\runtime. >&2
   EXIT /B 1
 )
-"@
+'@
     Set-Content -Path $wrapperCmd -Value $cmdContent -Encoding ASCII
 
     $wrapperPs1 = Join-Path $BinDir "aibl.ps1"
-    $ps1Content = @"
-`$AiblDir = Join-Path `$HOME ".aibl"
-`$NodeExe = Join-Path `$AiblDir "runtime\node\node.exe"
-`$CliEntry = Join-Path `$AiblDir "runtime\node_modules\@op-media-inc\aibl-author-cli\dist\index.js"
+    $ps1Content = @'
+$AiblDir = Join-Path $HOME ".aibl"
+$NodeExe = Join-Path $AiblDir "runtime\node\node.exe"
+$CliEntry = Join-Path $AiblDir "runtime\node_modules\@op-media-inc\aibl-author-cli\dist\index.js"
 
-`$env:PATH = "`$(Join-Path `$AiblDir 'runtime\node');`$(Join-Path `$AiblDir 'bin');`$env:PATH"
+$env:PATH = "$(Join-Path $AiblDir 'runtime\node');$(Join-Path $AiblDir 'bin');$env:PATH"
 
-if (Test-Path `$CliEntry) {
-    & `$NodeExe `$CliEntry @args
-} elseif (Test-Path (Join-Path `$AiblDir "runtime\aibl.cmd")) {
-    & (Join-Path `$AiblDir "runtime\aibl.cmd") @args
+if (Test-Path $CliEntry) {
+    & $NodeExe $CliEntry @args
+} elseif (Test-Path (Join-Path $AiblDir "runtime\aibl.cmd")) {
+    & (Join-Path $AiblDir "runtime\aibl.cmd") @args
 } else {
-    Write-Error "AiBL Author CLI executable not found in `$AiblDir\runtime."
+    Write-Error "AiBL Author CLI executable not found in $AiblDir\runtime."
     exit 1
 }
-"@
+'@
     Set-Content -Path $wrapperPs1 -Value $ps1Content -Encoding UTF8
 
     Write-Success "Executable wrappers configured in $BinDir"

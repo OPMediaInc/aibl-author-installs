@@ -11,13 +11,13 @@ There are different commands to run depending on how you like to install CLI app
 In order to install the CLI execute the following command on Windows:
 
 ```sh
-powershell -ExecutionPolicy ByPass -c "irm https://raw.githubusercontent.com/opmediainc/aibl-author-installs/main/cli/install.ps1 | iex"
+powershell -ExecutionPolicy ByPass -c "iex (irm https://raw.githubusercontent.com/opmediainc/aibl-author-installs/master/cli/install.ps1)"
 ```
 
 Or the following command for Mac and Linux:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/opmediainc/aibl-author-installs/main/cli/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/opmediainc/aibl-author-installs/master/cli/install.sh | bash
 ```
 
 ### Advanced Instlation:
