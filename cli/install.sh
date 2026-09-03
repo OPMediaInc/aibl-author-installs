@@ -3,7 +3,7 @@
 # AiBL Author CLI - Automated Standalone Installer for macOS & Linux
 # ==============================================================================
 # Usage:
-#   curl -fsSL https://raw.githubusercontent.com/opmediainc/aibl-author/main/scripts/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/opmediainc/aibl-author-installs/master/cli/install.sh | bash
 # ==============================================================================
 
 set -euo pipefail
