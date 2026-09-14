@@ -242,6 +242,16 @@ configure_claude_desktop() {
   fi
 }
 
+# 7. Automated ChatGPT / Codex Setup
+configure_chatgpt() {
+  local codex_dir="${HOME}/.codex"
+  if [ -d "${codex_dir}" ] || [ -f "${codex_dir}/config.toml" ]; then
+    info "Detected ChatGPT (Codex) installation. Configuring AiBL MCP bridge..."
+    "${AIBL_BIN_DIR}/aibl" mcp setup chatgpt --force >/dev/null 2>&1 || true
+    success "ChatGPT (Codex) MCP bridge configured."
+  fi
+}
+
 main() {
   print_banner
   detect_platform
@@ -250,6 +260,7 @@ main() {
   setup_executables
   configure_shell_path
   configure_claude_desktop
+  configure_chatgpt
 
   echo -e "\n======================================================"
   echo -e "       ${GREEN}${BOLD}AiBL Author CLI Setup Complete!${RESET}"
@@ -264,7 +275,7 @@ main() {
   echo -e "${BOLD}Next Steps:${RESET}"
   echo -e "  1. Authenticate with your AiBL account:"
   echo -e "     ${CYAN}aibl auth${RESET}\n"
-  echo -e "  2. (Optional) If Claude Desktop was open, quit completely (${BOLD}Cmd+Q${RESET}) and reopen it.\n"
+  echo -e "  2. (Optional) If Claude Desktop or ChatGPT / Codex was open, quit completely and reopen it.\n"
   echo -e "  3. If '${CYAN}aibl${RESET}' command is not found in your current terminal, reload your shell:"
   echo -e "     ${DIM}source ~/.zshrc${RESET}  or  ${DIM}source ~/.bashrc${RESET}\n"
 }

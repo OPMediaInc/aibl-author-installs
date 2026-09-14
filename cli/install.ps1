@@ -221,6 +221,21 @@ function Configure-ClaudeDesktop {
     }
 }
 
+function Configure-ChatGPT {
+    $codexDir = Join-Path $HOME ".codex"
+    $codexConfig = Join-Path $codexDir "config.toml"
+    if ((Test-Path $codexDir) -or (Test-Path $codexConfig)) {
+        Write-Info "Detected ChatGPT (Codex) installation. Configuring AiBL MCP bridge..."
+        $aiblCmd = Join-Path $BinDir "aibl.cmd"
+        try {
+            & $aiblCmd mcp setup chatgpt --force 2>$null | Out-Null
+            Write-Success "ChatGPT (Codex) MCP bridge configured."
+        } catch {
+            Write-Warn "Could not automatically configure ChatGPT (Codex): $($_.Exception.Message)"
+        }
+    }
+}
+
 function Main {
     Print-Banner
     $arch = Detect-Architecture
@@ -229,6 +244,7 @@ function Main {
     Setup-Executables
     Configure-EnvironmentPath
     Configure-ClaudeDesktop
+    Configure-ChatGPT
 
     Write-Host "`n======================================================" -ForegroundColor Green
     Write-Host "       AiBL Author CLI Setup Complete!" -ForegroundColor Green
@@ -250,7 +266,7 @@ function Main {
     Write-Host "Next Steps:" -ForegroundColor White
     Write-Host "  1. Authenticate with your AiBL account:"
     Write-Host "     aibl auth`n" -ForegroundColor Cyan
-    Write-Host "  2. (Optional) If Claude Desktop was open, quit completely and reopen it.`n"
+    Write-Host "  2. (Optional) If Claude Desktop or ChatGPT / Codex was open, quit completely and reopen it.`n"
     Write-Host "  3. If 'aibl' command is not recognized in existing terminals, open a new PowerShell window.`n"
 }
 

@@ -20,7 +20,7 @@ Or the following command for Mac and Linux:
 curl -fsSL https://raw.githubusercontent.com/opmediainc/aibl-author-installs/master/cli/install.sh | bash
 ```
 
-### Advanced Instlation:
+### Advanced Installation:
 
 You can also clone this repository and install on your computer:
 
@@ -104,6 +104,28 @@ You will also want to confirm the organizations and cores that you have access t
 aibl orgs list
 aibl cores list
 ```
+
+#### Model Context Protocol (MCP)
+
+To see supported MCP clients execute the following command:
+
+```sh
+aibl mcp list
+```
+
+To setup an MCP Client:
+
+```sh
+aibl mcp setup claude-desktop
+```
+
+You can replace `claude-desktop` with any supported MCP client from the list command. For example:
+
+```sh
+aibl mcp setup chatgpt
+```
+
+The install script currently sets up both Claude Desktop and ChatGPT if they are installed.
 
 #### Discover More
 
